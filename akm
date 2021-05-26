@@ -1,0 +1,78 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+profile="${HOME}/.akm"
+default_key="$profile/default.key"
+
+display_manual () {
+    cat <<EOF
+akm: age key manager and wrapper
+
+Options:
+-r {recipient}: read recipient key from ~/.akm/{recipient}.pub
+--recipient {recipient}: same as -r
+-h, --help: display this help
+rest: passed to age unmodified
+
+This program wraps age(1), adding --identity ~/.akm/default.key if no identities
+have been specified on the command line. For every --recipient passed it will
+read the correspondent ~/.akm/{recipient}.pub and pass the key from there.
+
+For list of age(1) options, see age --help.
+EOF
+}
+
+if [ ! -d "$profile" ]; then
+    printf 'creating %s for you... ' "$profile"
+    mkdir -p "$profile"
+    chmod 700 "$profile"
+    cat <<EOF
+done, be sure to generate a key and run:
+% ln -s {your_key_location} $HOME/.akm/default.key
+EOF
+    exit 0
+fi
+
+age_cmdline=""
+set_identity=1
+
+args=("$@")
+if [ "${#args[@]}" -eq "0" ]; then
+    display_manual
+    exit 0
+fi
+
+for (( i = 0; i < ${#args[@]}; i++ )); do
+    arg=${args[$i]}
+    case $arg in
+        "-h") ;&
+        "--help")
+            display_manual
+            exit 0
+            ;;
+        "-r") ;&
+        "--recipient")
+            next_arg=${args[$(( i + 1 ))]}
+            pubkey_path="$profile/$next_arg.pub"
+            age_cmdline=$(printf "%s -r %s" "$age_cmdline" "$(cat "$pubkey_path")")
+            i=$(( i + 1 ))
+            ;;
+        # with --encrypt --identity has another meaning
+        "-e") ;&
+        "--encrypt") ;&
+        "-i") ;&
+        "--identity")
+            set_identity=0
+            ;&
+        *)
+            age_cmdline=$(printf "%s %s" "$age_cmdline" "$arg")
+    esac
+done
+
+if [ "$set_identity" -ne 0 ]; then
+    # printf parses "--identity" as a cmdline key if it starts the string
+    age_cmdline=$(printf '%s %s.key %s' '--identity' "$default_key" "$age_cmdline")
+fi
+
+# shellcheck disable=SC2086
+exec age $age_cmdline # make sure to expand the args
