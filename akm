@@ -35,6 +35,7 @@ fi
 
 age_cmdline=""
 set_identity=1
+decrypt_mode=0
 
 args=("$@")
 if [ "${#args[@]}" -eq "0" ]; then
@@ -57,21 +58,22 @@ for (( i = 0; i < ${#args[@]}; i++ )); do
             age_cmdline=$(printf "%s -r %s" "$age_cmdline" "$(cat "$pubkey_path")")
             i=$(( i + 1 ))
             ;;
-        # with --encrypt --identity has another meaning
-        "-e") ;&
-        "--encrypt") ;&
         "-i") ;&
         "--identity")
             set_identity=0
+            ;&
+        "-d") ;&
+        "--decrypt")
+            decrypt_mode=1
             ;&
         *)
             age_cmdline=$(printf "%s %s" "$age_cmdline" "$arg")
     esac
 done
 
-if [ "$set_identity" -ne 0 ]; then
+if [ "$set_identity" -eq 1 ] && [ "$decrypt_mode" -eq 1 ]; then
     # printf parses "--identity" as a cmdline key if it starts the string
-    age_cmdline=$(printf '%s %s.key %s' '--identity' "$default_key" "$age_cmdline")
+    age_cmdline=$(printf '%s %s %s' '--identity' "$default_key" "$age_cmdline")
 fi
 
 # shellcheck disable=SC2086
