@@ -4,9 +4,9 @@ This shell script wraps [age(1)][age], an encryption tool, for convenience.
 
 As of now, it implements two convenience features over age:
 
-+ it adds the default encryption key (unless `-e / --encrypt` or
-`-i / --identity` have been specified manually)
-+ it wraps `-r / --recipient`: for `-r tdemin` it will read key contents from
++ it adds the default encryption key when `-d` / `--decrypt` is specified
+(unless `-i` / `--identity` has been specified)
++ it wraps `-r` / `--recipient`: for `-r tdemin` it will read key contents from
 `~/.akm/tdemin.pub`.
 
 [age]: https://github.com/FiloSottile/age
