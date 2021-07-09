@@ -50,7 +50,7 @@ decrypt_mode=0
 args=("$@")
 if [ "${#args[@]}" -eq "0" ]; then
     display_manual
-    exit 0
+    exit 1
 fi
 
 for (( i = 0; i < ${#args[@]}; i++ )); do
