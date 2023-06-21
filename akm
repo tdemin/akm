@@ -28,68 +28,72 @@ EOF
 }
 
 display_version () {
-    cat <<EOF
-akm ${version}
-EOF
+    echo "akm ${version}"
 }
 
-if [ ! -d "$profile" ]; then
-    printf 'creating %s for you... ' "$profile"
-    mkdir -p "$profile"
-    chmod 700 "$profile"
-    cat <<EOF
+initialize_profile () {
+    if [ ! -d "$profile" ]; then
+        printf 'creating %s for you... ' "$profile"
+        mkdir -p "$profile"
+        chmod 700 "$profile"
+        cat <<EOF
 done, be sure to generate a key and run:
-% ln -s {your_key_location} $HOME/.akm/default.key
+% ln -s {your_key_location} $profile/default.key
 EOF
-    exit 0
-fi
+        exit 0
+    fi
+}
 
-age_cmdline=""
-set_identity=1
-decrypt_mode=0
+main () {
+    initialize_profile
 
-args=("$@")
-if [ "${#args[@]}" -eq "0" ]; then
-    display_manual
-    exit 1
-fi
+    if [ $# -eq "0" ]; then
+        display_manual
+        exit 1
+    fi
 
-for (( i = 0; i < ${#args[@]}; i++ )); do
-    arg=${args[$i]}
-    case $arg in
-        "--version")
-            display_version
-            exit 0
-            ;;
-        "-h") ;&
-        "--help")
-            display_manual
-            exit 0
-            ;;
-        "-r") ;&
-        "--recipient")
-            next_arg=${args[$(( i + 1 ))]}
-            pubkey_path="$profile/$next_arg.pub"
-            age_cmdline=$(printf "%s -r %s" "$age_cmdline" "$(cat "$pubkey_path")")
-            i=$(( i + 1 ))
-            ;;
-        "-i") ;&
-        "--identity")
-            set_identity=0
-            ;&
-        "-d") ;&
-        "--decrypt")
-            decrypt_mode=1
-            ;&
-        *)
-            age_cmdline=$(printf "%s %s" "$age_cmdline" "$arg")
-    esac
-done
+    local age_cmdline=() age_pre_cmdline="" set_identity=1 decrypt_mode=0
 
-if [ "$set_identity" -eq 1 ] && [ "$decrypt_mode" -eq 1 ]; then
-    # printf parses "--identity" as a cmdline key if it starts the string
-    age_cmdline=$(printf '%s %s %s' '--identity' "$default_key" "$age_cmdline")
-fi
+    for (( i=1; i <= $#; i++ )); do
+        local arg=${!i}
+        case $arg in
+            "--version")
+                display_version
+                exit 0 ;;
+            "-h") ;&
+            "--help")
+                display_manual
+                exit 0 ;;
+            "-r") ;&
+            "--recipient")
+                local next_arg_pos=$(( i+1 ))
+                local next_arg=${!next_arg_pos}
+                pubkey_path="$profile/$next_arg.pub"
+                pubkey=$(cat "$pubkey_path")
+                age_cmdline+=('--recipient')
+                age_cmdline+=("$pubkey")
+                i=$(( i+1 ))
+                ;;
+            "-i") ;&
+            "--identity")
+                set_identity=0
+                ;&
+            "-d") ;&
+            "--decrypt")
+                decrypt_mode=1
+                ;&
+            *)
+                age_cmdline+=("$arg")
+        esac
+    done
 
-# shellcheck disable=SC2086
-exec age $age_cmdline # make sure to expand the args
+    if [ "$set_identity" -eq 1 ] && [ "$decrypt_mode" -eq 1 ]; then
+        # identity flag should always come first
+        age_pre_cmdline="--identity $default_key"
+    fi
+
+    # shellcheck disable=SC2086
+    exec age ${age_pre_cmdline} "${age_cmdline[@]}" # make sure to expand the args
+}
+
+main "$@"
