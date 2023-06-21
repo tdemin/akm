@@ -3,8 +3,8 @@ set -euo pipefail
 
 version="0.2.0"
 
-: ${AKM_PROFILE:=${HOME}/.akm}
-: ${AKM_DEFAULT_KEY_FILENAME:=${AKM_PROFILE}/default.key}
+: "${AKM_PROFILE:=${HOME}/.akm}"
+: "${AKM_DEFAULT_KEY_FILENAME:=${AKM_PROFILE}/default.key}"
 
 profile="${AKM_PROFILE}"
 default_key="${AKM_DEFAULT_KEY_FILENAME}"
@@ -40,7 +40,7 @@ display_version () {
 }
 
 initialize_profile () {
-    if [ ! -z "$skip_create_profile" ]; then
+    if [ -n "$skip_create_profile" ]; then
         return
     fi
 
