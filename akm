@@ -8,6 +8,7 @@ version="0.1.0"
 
 profile="${AKM_PROFILE}"
 default_key="${AKM_DEFAULT_KEY_FILENAME}"
+skip_create_profile="${AKM_PROFILE_SKIP_CREATE:-}"
 
 display_manual () {
     cat <<EOF
@@ -35,6 +36,10 @@ display_version () {
 }
 
 initialize_profile () {
+    if [ ! -z "$skip_create_profile" ]; then
+        return
+    fi
+
     if [ ! -d "$profile" ]; then
         printf 'creating %s for you... ' "$profile"
         mkdir -p "$profile"
