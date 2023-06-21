@@ -3,8 +3,11 @@ set -euo pipefail
 
 version="0.1.0"
 
-profile="${HOME}/.akm"
-default_key="$profile/default.key"
+: ${AKM_PROFILE:=${HOME}/.akm}
+: ${AKM_DEFAULT_KEY_FILENAME:=${AKM_PROFILE}/default.key}
+
+profile="${AKM_PROFILE}"
+default_key="${AKM_DEFAULT_KEY_FILENAME}"
 
 display_manual () {
     cat <<EOF
@@ -38,9 +41,8 @@ initialize_profile () {
         chmod 700 "$profile"
         cat <<EOF
 done, be sure to generate a key and run:
-% ln -s {your_key_location} $profile/default.key
+% ln -s {your_key_location} $default_key
 EOF
-        exit 0
     fi
 }
 
