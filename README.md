@@ -8,9 +8,13 @@ As of now, it implements two convenience features over age:
 + it adds the default encryption key when `-d` / `--decrypt` is specified
 (unless `-i` / `--identity` has been specified)
 + it wraps `-r` / `--recipient`: for `-r tdemin` it will read key contents from
-`~/.akm/tdemin.pub`.
+`~/.akm/tdemin.pub`
+* it generates a `keys.txt` for [sops][sops] in `~/.akm/sops-keys.txt`: linking
+`~/.config/sops/age/keys.txt` will make sops decrypt with every key from
+`~/.akm/*.key`.
 
 [age]: https://github.com/FiloSottile/age
+[sops]: https://github.com/mozilla/sops
 
 ### Usage
 
@@ -52,6 +56,10 @@ specified on the command line.
 Environment variables AKM_PROFILE and AKM_DEFAULT_KEY_FILENAME can be used to
 override ~/.akm and ~/.akm/default.key, respectively. If AKM_PROFILE_SKIP_CREATE
 is set, akm will skip creating AKM_PROFILE on first run.
+
+akm manages a list of all age keys in ~/.akm/*.key for use with sops in
+~/.akm/sops-keys.txt, which can be used to link ~/.config/sops/age/keys.txt to.
+If this is undesirable, set AKM_PROFILE_SKIP_SOPS to a non-empty value.
 
 For list of age(1) options, see age --help.
 ```

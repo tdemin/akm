@@ -9,6 +9,7 @@ version="0.2.0"
 profile="${AKM_PROFILE}"
 default_key="${AKM_DEFAULT_KEY_FILENAME}"
 skip_create_profile="${AKM_PROFILE_SKIP_CREATE:-}"
+skip_create_sops="${AKM_PROFILE_SKIP_SOPS:-}"
 
 display_manual () {
     cat <<EOF
@@ -31,12 +32,24 @@ Environment variables AKM_PROFILE and AKM_DEFAULT_KEY_FILENAME can be used to
 override ~/.akm and ~/.akm/default.key, respectively. If AKM_PROFILE_SKIP_CREATE
 is set, akm will skip creating AKM_PROFILE on first run.
 
+akm manages a list of all age keys in ~/.akm/*.key for use with sops in
+~/.akm/sops-keys.txt, which can be used to link ~/.config/sops/age/keys.txt to.
+If this is undesirable, set AKM_PROFILE_SKIP_SOPS to a non-empty value.
+
 For list of age(1) options, see age --help.
 EOF
 }
 
 display_version () {
     echo "akm ${version}"
+}
+
+sync_sops_keys () {
+    if [ -n "$skip_create_sops" ]; then
+        return
+    fi
+
+    cat "$profile"/*.key > "$profile"/sops-keys.txt
 }
 
 initialize_profile () {
@@ -57,6 +70,7 @@ EOF
 
 main () {
     initialize_profile
+    sync_sops_keys
 
     if [ $# -eq "0" ]; then
         display_manual
