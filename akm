@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-version="0.2.0"
+version="0.3.0"
 
 : "${AKM_PROFILE:=${HOME}/.akm}"
 : "${AKM_DEFAULT_KEY_FILENAME:=${AKM_PROFILE}/default.key}"
