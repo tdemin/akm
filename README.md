@@ -3,7 +3,7 @@
 This shell script wraps [age(1)][age], an encryption tool, for convenience in
 everyday interactive use.
 
-As of now, it implements two convenience features over age:
+As of now, it implements three convenience features over age:
 
 + it adds the default encryption key when `-d` / `--decrypt` is specified
 (unless `-i` / `--identity` has been specified)
