@@ -11,11 +11,12 @@ display_manual () {
 akm: age key manager and wrapper
 
 Options:
--r {recipient}: read recipient key from ~/.akm/{recipient}.pub
---recipient {recipient}: same as -r
--h, --help: display this help
---version: display akm version
-rest: passed to age unmodified
+
+  -r {recipient}:          read recipient key from ~/.akm/{recipient}.pub
+  --recipient {recipient}: same as -r
+  -h, --help:              display this help
+  --version:               display akm version
+  rest of args:            passed to age unmodified
 
 This program wraps age(1). For every --recipient passed it will read the
 correspondent ~/.akm/{recipient}.pub and pass the key from there. When -d is
