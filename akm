@@ -27,6 +27,10 @@ correspondent ~/.akm/{recipient}.pub and pass the key from there. When -d is
 specified, it will add --identity ~/.akm/default.key if no identities have been
 specified on the command line.
 
+Environment variables AKM_PROFILE and AKM_DEFAULT_KEY_FILENAME can be used to
+override ~/.akm and ~/.akm/default.key, respectively. If AKM_PROFILE_SKIP_CREATE
+is set, akm will skip creating AKM_PROFILE on first run.
+
 For list of age(1) options, see age --help.
 EOF
 }
