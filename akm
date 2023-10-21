@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
+shopt -s nullglob
 
 version="0.3.1"
 
@@ -45,7 +46,7 @@ display_version () {
 }
 
 log () {
-    echo "akm: $@" >&2
+    echo "akm: $*" >&2
 }
 
 sync_sops_keys () {
@@ -53,12 +54,17 @@ sync_sops_keys () {
         return
     fi
 
-    local keys="$profile"/*.key
+    # shellcheck disable=SC2155
+    local keys=$(echo "$profile"/*.key) dest="$profile/sops-keys.txt"
     if [ -z "$keys" ]; then
+        log "emptying out $dest"
+        truncate -s0 "$dest"
         return
     fi
 
-    cat $keys > "$profile"/sops-keys.txt
+    log "syncing sops keys"
+    # shellcheck disable=SC2086
+    cat $keys > $dest
 }
 
 initialize_profile () {
