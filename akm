@@ -2,7 +2,7 @@
 set -euo pipefail
 shopt -s nullglob
 
-version="0.3.1"
+version="0.3.2"
 
 : "${AKM_PROFILE:=${HOME}/.akm}"
 : "${AKM_DEFAULT_KEY_FILENAME:=${AKM_PROFILE}/default.key}"
