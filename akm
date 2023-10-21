@@ -44,6 +44,10 @@ display_version () {
     echo "akm ${version}"
 }
 
+log () {
+    echo "akm: $@" >&2
+}
+
 sync_sops_keys () {
     if [ -n "$skip_create_sops" ]; then
         return
@@ -58,13 +62,10 @@ initialize_profile () {
     fi
 
     if [ ! -d "$profile" ]; then
-        printf 'creating %s for you... ' "$profile"
+        log "creating $profile"
         mkdir -p "$profile"
         chmod 700 "$profile"
-        cat <<EOF
-done, be sure to generate a key and run:
-% ln -s {your_key_location} $default_key
-EOF
+        log "created $profile, remember to run ln -s {key} $default_key"
     fi
 }
 
