@@ -69,9 +69,6 @@ EOF
 }
 
 main () {
-    initialize_profile
-    sync_sops_keys
-
     if [ $# -eq "0" ]; then
         display_manual
         exit 1
@@ -116,6 +113,9 @@ main () {
         # identity flag should always come first
         age_pre_cmdline="--identity $default_key"
     fi
+
+    initialize_profile
+    sync_sops_keys
 
     # shellcheck disable=SC2086
     exec age ${age_pre_cmdline} "${age_cmdline[@]}" # make sure to expand the args
