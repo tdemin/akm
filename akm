@@ -53,7 +53,12 @@ sync_sops_keys () {
         return
     fi
 
-    cat "$profile"/*.key > "$profile"/sops-keys.txt
+    local keys="$profile"/*.key
+    if [ -z "$keys" ]; then
+        return
+    fi
+
+    cat $keys > "$profile"/sops-keys.txt
 }
 
 initialize_profile () {
